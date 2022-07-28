@@ -47,6 +47,10 @@ public class MainController {
     @FXML
     private ComboBox<String> methodOpt;
     @FXML
+    private TextField globalHeader;
+    @FXML
+    private TextField post_data;
+    @FXML
     private TextField shiroKeyWord;
     @FXML
     private TextField targetAddress;
@@ -209,8 +213,17 @@ public class MainController {
         String shiroKeyWordText = this.shiroKeyWord.getText();
         String targetAddressText = this.targetAddress.getText();
         String httpTimeoutText = this.httpTimeout.getText();
+        //自定义请求头
+        Map<String, String> myheader= new HashMap<>() ;
+        if(!this.globalHeader.getText().equals("")) {
+            String header[] = this.globalHeader.getText().split(":",2);
+//        myheader(this.globalHeader.getText() -> this.globalHeader.getText().split(":"))
+            myheader.put(header[0], header[1]);
+        }
+//        this.globalHeader = myheader
+        String postData = (String)this.post_data.getText();
         String reqMethod = (String)this.methodOpt.getValue();
-        this.attackService = new AttackService(reqMethod, targetAddressText, shiroKeyWordText, httpTimeoutText);
+        this.attackService = new AttackService(reqMethod, targetAddressText, shiroKeyWordText, httpTimeoutText,myheader,postData);
         if (this.aesGcmOpt.isSelected()) {
             AttackService.aesGcmCipherType = 1;
         } else {
@@ -225,19 +238,19 @@ public class MainController {
     }
 
     public void initComBoBox() {
+//        ObservableList<String> methods = FXCollections.observableArrayList(new String[]{"GET", "POST","复杂请求"});
         ObservableList<String> methods = FXCollections.observableArrayList(new String[]{"GET", "POST"});
         this.methodOpt.setPromptText("GET");
         this.methodOpt.setValue("GET");
         this.methodOpt.setItems(methods);
-        ObservableList<String> gadgets = FXCollections.observableArrayList(new String[]{ "CommonsBeanutils1","CommonsBeanutils1_192", "CommonsCollections2", "CommonsCollections3", "CommonsCollectionsK1", "CommonsCollectionsK2", "CommonsBeanutilsString", "CommonsBeanutilsString_192", "CommonsBeanutilsAttrCompare", "CommonsBeanutilsAttrCompare_192", "CommonsBeanutilsPropertySource","CommonsBeanutilsPropertySource_192", "CommonsBeanutilsObjectToStringComparator", "CommonsBeanutilsObjectToStringComparator_192"});
+        ObservableList<String> gadgets = FXCollections.observableArrayList(new String[]{ "CommonsBeanutils1","CommonsBeanutils1_183", "CommonsCollections2", "CommonsCollections3", "CommonsCollectionsK1", "CommonsCollectionsK2", "CommonsBeanutilsString", "CommonsBeanutilsString_183", "CommonsBeanutilsAttrCompare", "CommonsBeanutilsAttrCompare_183", "CommonsBeanutilsPropertySource","CommonsBeanutilsPropertySource_183", "CommonsBeanutilsObjectToStringComparator", "CommonsBeanutilsObjectToStringComparator_183"});
 //        ObservableList<String> gadgets = FXCollections.observableArrayList(new String[]{ "CommonsBeanutils1" ,"CommonsBeanutils1_183" ,"CommonsCollections2", "CommonsCollections3", "CommonsCollectionsK1", "CommonsCollectionsK2", "CommonsBeanutilsString", "CommonsBeanutilsAttrCompare", "CommonsBeanutilsPropertySource", "CommonsBeanutilsObjectToStringComparator"});
 //        ObservableList<String> gadgets = FXCollections.observableArrayList(new String[]{ "CommonsCollections2", "CommonsCollections3", "CommonsCollectionsK1", "CommonsCollectionsK2", "CommonsBeanutilsString", "CommonsBeanutilsAttrCompare", "CommonsBeanutilsPropertySource", "CommonsBeanutilsObjectToStringComparator"});
         this.gadgetOpt.setPromptText("CommonsBeanutilsString");
         this.gadgetOpt.setValue("CommonsBeanutilsString");
         this.gadgetOpt.setItems(gadgets);
         ObservableList<String> echoes = FXCollections.observableArrayList(new String[]{"AllEcho","TomcatEcho", "SpringEcho"});
-//        ObservableList<String> echoes = FXCollections.observableArrayList(new String[]{"TomcatEcho", "SpringEcho"});
-//        ObservableList<String> echoes = FXCollections.observableArrayList(new String[]{"TomcatEcho", "SpringEcho", "NoEcho", "ReverseEcho"});
+//        ObservableList<String> echoes = FXCollections.observableArrayList(new String[]{"AllEcho","TomcatEcho", "TomcatEcho2", "SpringEcho"});
         this.echoOpt.setPromptText("TomcatEcho");
         this.echoOpt.setValue("TomcatEcho");
         this.echoOpt.setItems(echoes);
@@ -295,8 +308,10 @@ public class MainController {
             typeCombo.getSelectionModel().select(0);
             Label IPLabel = new Label("IP地址：");
             TextField IPText = new TextField();
+            IPText.setText("127.0.0.1");
             Label PortLabel = new Label("端口：");
             TextField PortText = new TextField();
+            PortText.setText("8080");
             Label userNameLabel = new Label("用户名：");
             TextField userNameText = new TextField();
             Label passwordLabel = new Label("密码：");
